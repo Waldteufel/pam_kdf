@@ -1,8 +1,7 @@
-#!/usr/bin/bash
+#!/usr/bin/zsh
 if [[ "$1" == "-a" ]]
 then
-	DISPLAY=- SSH_ASKPASS="$0" ssh-add </dev/null
-	keyctl purge user login
+	DISPLAY=- SSH_ASKPASS="$0" ssh-add ~$PAM_USER/.ssh/id_ed25519 </dev/null
 else
 	id=$(keyctl request user login @s) || exit 1
 	keyctl pipe $id | base64
