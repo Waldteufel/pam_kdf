@@ -1,11 +1,11 @@
 #!/usr/bin/zsh
-if [[ "$1" == "-a" ]]
-then
-	export DISPLAY=-
-	export SSH_ASKPASS=$0
-	export SSH_AUTH_SOCK=/run/user/$(id -u $PAM_USER)/ssh-agent
-	ssh-add ~$PAM_USER/.ssh/id_ed25519 </dev/null
-else
-	id=$(keyctl request user login @s) || exit 1
-	keyctl pipe $id | base64
-fi
+unset DISPLAY
+unset SSH_ASKPASS
+export SSH_AUTH_SOCK=/run/user/$(id -u $PAM_USER)/ssh-agent
+
+id=$(keyctl request user login @s) || exit 10
+[ -S "$SSH_AUTH_SOCK" ] || exit 20
+[ -f ~$PAM_USER/.ssh/id_ed25519 ] || exit 30
+
+# setsid -> no controlling terminal, read from stdin
+keyctl pipe $id | base64 | setsid -w ssh-add -q ~$PAM_USER/.ssh/id_ed25519
