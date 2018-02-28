@@ -9,7 +9,7 @@ your ssh keys.
 
 Example (Arch Linux):
 ```
-~> cat /etc/pam.d/system-login
+~> cat /etc/pam.d/system-login 
 #%PAM-1.0
 
 auth       required   pam_tally.so         onerr=succeed file=/var/log/faillog
@@ -25,11 +25,12 @@ account    include    system-auth
 password   include    system-auth
 
 session    optional   pam_loginuid.so
+session    optional   pam_exec.so type=open_session /usr/local/lib/keyctl-ssh-helper
+session    optional   pam_exec.so /usr/bin/keyctl purge user login
+session    optional   pam_keyinit.so       force revoke
 session    include    system-auth
 session    optional   pam_motd.so          motd=/etc/motd
 session    optional   pam_mail.so          dir=/var/spool/mail standard quiet
 -session   optional   pam_systemd.so
 session    required   pam_env.so
-session    optional   pam_exec.so type=open_session /usr/local/lib/keyctl-ssh-helper -a
-session    optional   pam_exec.so /usr/bin/keyctl purge user login
 ```
